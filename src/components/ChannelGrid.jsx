@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Search, Star, Play, Tv, ChevronDown } from 'lucide-react';
 import './ChannelGrid.css';
 
@@ -12,6 +12,33 @@ export default function ChannelGrid({
 }) {
   const [searchQuery, setSearchQuery] = useState('');
   const [visibleLimit, setVisibleLimit] = useState(120);
+
+  const longPressTimeout = useRef(null);
+  const isLongPress = useRef(false);
+
+  const handleKeyDown = (e, channel) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (e.repeat) return;
+      isLongPress.current = false;
+      
+      longPressTimeout.current = setTimeout(() => {
+        isLongPress.current = true;
+        onToggleFavorite(channel.id);
+      }, 700);
+    }
+  };
+
+  const handleKeyUp = (e, channel) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      clearTimeout(longPressTimeout.current);
+      if (!isLongPress.current) {
+        onSelectChannel(channel);
+      }
+      isLongPress.current = false;
+    }
+  };
 
   // Reset pagination limit on search or category change
   useEffect(() => {
@@ -108,6 +135,8 @@ export default function ChannelGrid({
                     key={channel.id}
                     className={`channel-card ${isActive ? 'active' : ''}`}
                     onClick={() => onSelectChannel(channel)}
+                    onKeyDown={(e) => handleKeyDown(e, channel)}
+                    onKeyUp={(e) => handleKeyUp(e, channel)}
                     tabIndex="0"
                   >
                     {/* Favorite Button (Top Right) */}
@@ -115,6 +144,7 @@ export default function ChannelGrid({
                       className={`channel-card-fav-btn ${isFav ? 'is-fav' : ''}`}
                       onClick={(e) => handleToggleFav(e, channel.id)}
                       title={isFav ? "Remover dos Favoritos" : "Adicionar aos Favoritos"}
+                      tabIndex="-1"
                     >
                       <Star size={14} fill={isFav ? "currentColor" : "none"} />
                     </button>
