@@ -19,7 +19,14 @@ export default function Sidebar({
   channels = [],
   favorites = []
 }) {
-  
+  const getCleanCategoryName = (name) => {
+    if (!name) return '';
+    const cleaned = name
+      .replace(/^([\[(🟢🔵🔴⚫🟣🟡🟠🔴⚜️⚠️⚡🔥🎬🍿🎥📺🎞️🎵📻⚽🏆🎮👾].*?[\])]|\|.*?\||[^a-zA-Z0-9\sÁ-Úá-ú])+\s*/g, '')
+      .trim();
+    return cleaned || name;
+  };
+
   // Calculate counts for categories
   const getCategoryCounts = () => {
     const counts = {
@@ -131,7 +138,7 @@ export default function Sidebar({
                 className={`category-item ${activeCategory === cat ? 'active' : ''}`}
                 onClick={() => setActiveCategory(cat)}
               >
-                <span className="category-name">{cat}</span>
+                <span className="category-name">{getCleanCategoryName(cat)}</span>
                 <span className="category-count">{counts[cat] || 0}</span>
               </button>
             ))}

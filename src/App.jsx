@@ -18,6 +18,8 @@ import {
 } from 'lucide-react';
 import './App.css';
 
+const isAndroid = /Android|AFT/i.test(navigator.userAgent);
+
 export default function App() {
   // Navigation & View State
   const [activeTab, setActiveTab] = useState('home');
@@ -499,14 +501,16 @@ export default function App() {
               </div>
 
               {/* Right pane: Video player (Preview) */}
-              <div className="player-pane">
-                {!isPlayerExpanded && (
-                  <Player 
-                    channel={currentChannel} 
-                    onChannelPlayed={handleChannelPlayed}
-                  />
-                )}
-              </div>
+              {!isAndroid && (
+                <div className="player-pane">
+                  {!isPlayerExpanded && (
+                    <Player 
+                      channel={currentChannel} 
+                      onChannelPlayed={handleChannelPlayed}
+                    />
+                  )}
+                </div>
+              )}
             </div>
           )}
 
