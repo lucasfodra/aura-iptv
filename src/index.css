@@ -1,0 +1,204 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Colors */
+  --bg-main: #0a0a0f;
+  --bg-sidebar: #0f0f16;
+  --bg-card: rgba(22, 22, 33, 0.7);
+  --bg-card-hover: rgba(35, 35, 54, 0.85);
+  --bg-input: rgba(15, 15, 25, 0.8);
+  
+  --accent-primary: #9d4edd; /* Neon Purple */
+  --accent-secondary: #00f5d4; /* Neon Cyan */
+  --accent-glow: rgba(157, 78, 221, 0.45);
+  --accent-glow-cyan: rgba(0, 245, 212, 0.3);
+  
+  --text-main: #f8f9fa;
+  --text-muted: #9ba1b0;
+  --text-dark: #6c757d;
+  
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-focus: rgba(157, 78, 221, 0.6);
+  
+  /* Layout & Animations */
+  --sidebar-width: 260px;
+  --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --glass-blur: blur(16px);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  
+  /* Fonts */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  overflow: hidden;
+}
+
+#root {
+  display: flex;
+  flex-direction: row;
+  min-height: 100vh;
+  max-width: 100% !important;
+  border-inline: none !important;
+  text-align: left !important;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+  box-shadow: 0 0 8px var(--accent-primary);
+}
+
+/* Glassmorphism panel helper */
+.glass-panel {
+  background: var(--bg-card);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--glass-shadow);
+  border-radius: 16px;
+  transition: var(--transition-smooth);
+}
+
+.glass-panel:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+/* Glow effects */
+.glow-text-purple {
+  text-shadow: 0 0 10px var(--accent-glow);
+}
+
+.glow-text-cyan {
+  text-shadow: 0 0 10px var(--accent-glow-cyan);
+}
+
+.glow-border {
+  box-shadow: 0 0 15px var(--accent-glow);
+  border-color: var(--accent-primary) !important;
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-main);
+}
+
+/* Inputs & Buttons global rules */
+input, select, textarea, button {
+  font-family: inherit;
+}
+
+/* Utility Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 0.6;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 20px var(--accent-primary);
+  }
+}
+
+.pulse-indicator {
+  width: 8px;
+  height: 8px;
+  background-color: var(--accent-secondary);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--accent-glow-cyan);
+  display: inline-block;
+  animation: pulse-glow 2s infinite;
+}
+
+.live-indicator {
+  background-color: #ef233c;
+  color: #fff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: 0 0 8px rgba(239, 35, 60, 0.5);
+}
+
+.live-indicator::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  background-color: #fff;
+  border-radius: 50%;
+  animation: pulse-glow 1.5s infinite;
+}
+
+/* Smart TV & D-pad Spatial Navigation Focus Styles */
+button:focus,
+input:focus,
+select:focus,
+[tabindex="0"]:focus,
+a:focus {
+  outline: 2px solid var(--accent-secondary) !important;
+  box-shadow: 0 0 15px var(--accent-glow-cyan) !important;
+  border-color: var(--accent-secondary) !important;
+  transition: transform 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+/* Slightly scale channel cards when focused for 10-foot UI feedback */
+.channel-card:focus {
+  transform: scale(1.04) translateY(-4px) !important;
+  background: var(--bg-card-hover) !important;
+}
+
+/* Sidebar navigation item focus scale */
+.sidebar-nav-item:focus {
+  background: rgba(255, 255, 255, 0.05) !important;
+  transform: translateX(4px) !important;
+}
+
+/* Category list item focus scale */
+.category-item:focus {
+  background: rgba(255, 255, 255, 0.05) !important;
+  transform: translateX(4px) !important;
+}
+

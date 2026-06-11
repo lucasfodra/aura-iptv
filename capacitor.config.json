@@ -1,0 +1,9 @@
+{
+  "appId": "com.aura.iptv",
+  "appName": "Aura IPTV",
+  "webDir": "dist",
+  "server": {
+    "url": "https://aura-iptv-blush.vercel.app",
+    "cleartext": true
+  }
+}
