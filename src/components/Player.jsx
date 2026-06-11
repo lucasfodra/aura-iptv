@@ -10,11 +10,12 @@ import {
   Tv, 
   AlertTriangle,
   RotateCcw,
-  Sparkles
+  Sparkles,
+  ArrowLeft
 } from 'lucide-react';
 import './Player.css';
 
-export default function Player({ channel, onChannelPlayed }) {
+export default function Player({ channel, onChannelPlayed, onClose }) {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const hlsRef = useRef(null);
@@ -366,6 +367,16 @@ export default function Player({ channel, onChannelPlayed }) {
         {/* Header: Title and logo */}
         <div className="player-header">
           <div className="player-channel-info">
+            {onClose && (
+              <button 
+                className="player-btn player-back-btn" 
+                onClick={onClose} 
+                title="Voltar" 
+                style={{ marginRight: '12px', background: 'rgba(255,255,255,0.1)' }}
+              >
+                <ArrowLeft size={20} />
+              </button>
+            )}
             {channel.logo ? (
               <img 
                 className="player-channel-logo" 

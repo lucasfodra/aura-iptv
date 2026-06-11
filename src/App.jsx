@@ -22,6 +22,7 @@ export default function App() {
   // Navigation & View State
   const [activeTab, setActiveTab] = useState('home');
   const [activeCategory, setActiveCategory] = useState('Todos');
+  const [isPlayerExpanded, setIsPlayerExpanded] = useState(false);
   
   // Data State
   const [playlists, setPlaylists] = useState([]);
@@ -72,6 +73,25 @@ export default function App() {
     const cleanUp = initSpatialNavigation();
     return () => cleanUp();
   }, []);
+
+  // Handle Backspace/Escape keys to close the full-screen player
+  useEffect(() => {
+    const handleBackKey = (e) => {
+      if (!isPlayerExpanded) return;
+      
+      if (e.key === 'Escape' || e.key === 'Backspace') {
+        const active = document.activeElement;
+        if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA')) {
+          return;
+        }
+        e.preventDefault();
+        setIsPlayerExpanded(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleBackKey, true); // Use capture phase to intercept before spatialNav
+    return () => window.removeEventListener('keydown', handleBackKey, true);
+  }, [isPlayerExpanded]);
 
   // Sync playlists to IndexedDB
   const savePlaylistsToStorage = async (newPlaylists) => {
@@ -144,6 +164,7 @@ export default function App() {
     };
     setCurrentChannel(originalChannel);
     setActiveTab('channels');
+    setIsPlayerExpanded(true);
   };
 
   // 6. Handle channel playback tracking
@@ -495,6 +516,30 @@ export default function App() {
                   </div>
                 </div>
 
+                <div className="glass-panel settings-card">
+                  <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <Sparkles size={20} style={{ color: 'var(--accent-secondary)' }} />
+                    Atualizações do Sistema
+                  </h3>
+                  <div className="settings-row">
+                    <div className="settings-info">
+                      <span className="settings-label">Forçar Atualização</span>
+                      <span className="settings-desc">Recarrega o aplicativo limpando o cache para buscar a última versão do site.</span>
+                    </div>
+                    <button 
+                      className="btn-toolbar" 
+                      onClick={(e) => {
+                        e.target.innerText = "Buscando...";
+                        setTimeout(() => {
+                          window.location.reload(true);
+                        }, 1000);
+                      }}
+                    >
+                      Buscar Atualizações
+                    </button>
+                  </div>
+                </div>
+
                 <div className="glass-panel settings-card" style={{ borderColor: 'rgba(239, 35, 60, 0.2)' }}>
                   <h3 style={{ marginBottom: '16px', fontSize: '1.2rem', color: '#ef233c', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Trash2 size={20} />
@@ -516,6 +561,17 @@ export default function App() {
 
         </div>
       </div>
+
+      {/* Fullscreen Player Overlay */}
+      {isPlayerExpanded && currentChannel && (
+        <div className="fullscreen-player-overlay">
+          <Player 
+            channel={currentChannel} 
+            onChannelPlayed={handleChannelPlayed}
+            onClose={() => setIsPlayerExpanded(false)}
+          />
+        </div>
+      )}
     </div>
   );
 }
