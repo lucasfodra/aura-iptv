@@ -74,6 +74,23 @@ export default function App() {
     return () => cleanUp();
   }, []);
 
+  // Manage browser history to handle TV hardware Back button without closing the app
+  useEffect(() => {
+    if (isPlayerExpanded) {
+      window.history.pushState({ playerExpanded: true }, '');
+    }
+  }, [isPlayerExpanded]);
+
+  useEffect(() => {
+    const handlePopState = (e) => {
+      if (isPlayerExpanded) {
+        setIsPlayerExpanded(false);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [isPlayerExpanded]);
+
   // Handle Backspace/Escape keys to close the full-screen player
   useEffect(() => {
     const handleBackKey = (e) => {
@@ -85,11 +102,17 @@ export default function App() {
           return;
         }
         e.preventDefault();
-        setIsPlayerExpanded(false);
+        
+        // Use history back to trigger popstate listener and close player
+        if (window.history.state && window.history.state.playerExpanded) {
+          window.history.back();
+        } else {
+          setIsPlayerExpanded(false);
+        }
       }
     };
 
-    window.addEventListener('keydown', handleBackKey, true); // Use capture phase to intercept before spatialNav
+    window.addEventListener('keydown', handleBackKey, true);
     return () => window.removeEventListener('keydown', handleBackKey, true);
   }, [isPlayerExpanded]);
 
@@ -477,10 +500,12 @@ export default function App() {
 
               {/* Right pane: Video player (Preview) */}
               <div className="player-pane">
-                <Player 
-                  channel={currentChannel} 
-                  onChannelPlayed={handleChannelPlayed}
-                />
+                {!isPlayerExpanded && (
+                  <Player 
+                    channel={currentChannel} 
+                    onChannelPlayed={handleChannelPlayed}
+                  />
+                )}
               </div>
             </div>
           )}
@@ -578,7 +603,13 @@ export default function App() {
           <Player 
             channel={currentChannel} 
             onChannelPlayed={handleChannelPlayed}
-            onClose={() => setIsPlayerExpanded(false)}
+            onClose={() => {
+              if (window.history.state && window.history.state.playerExpanded) {
+                window.history.back();
+              } else {
+                setIsPlayerExpanded(false);
+              }
+            }}
             channels={channels}
             onSelectChannel={handleSelectChannel}
           />

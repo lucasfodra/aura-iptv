@@ -5,7 +5,8 @@ import {
   Tv, 
   Star, 
   Sparkles,
-  Heart
+  Heart,
+  Settings as SettingsIcon
 } from 'lucide-react';
 import './Sidebar.css';
 
@@ -81,6 +82,14 @@ export default function Sidebar({
           <Tv size={18} />
           <span>Canais</span>
         </button>
+
+        <button 
+          className={`sidebar-nav-item ${activeTab === 'settings' ? 'active' : ''}`}
+          onClick={() => setActiveTab('settings')}
+        >
+          <SettingsIcon size={18} />
+          <span>Configurações</span>
+        </button>
       </nav>
 
       {/* Categories section - only visible on Channels tab */}
@@ -131,11 +140,30 @@ export default function Sidebar({
       )}
 
       {/* Footer */}
-      <div className="sidebar-footer">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+      <div className="sidebar-footer" style={{ flexDirection: 'column', gap: '8px', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
           <span>Aura IPTV v1.0.0</span>
+          <button 
+            className="update-btn-sidebar" 
+            onClick={(e) => {
+              e.target.innerText = "Buscando...";
+              setTimeout(() => {
+                window.location.reload(true);
+              }, 1000);
+            }}
+            style={{
+              background: 'rgba(255,255,255,0.05)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              borderRadius: '4px',
+              color: 'var(--accent-secondary)',
+              fontSize: '0.7rem',
+              padding: '4px 8px',
+              cursor: 'pointer'
+            }}
+          >
+            Atualizar
+          </button>
         </div>
-        <div className="pulse-indicator"></div>
       </div>
     </div>
   );

@@ -40,6 +40,15 @@ export default function Player({ channel, onChannelPlayed, onClose, channels = [
     const handleKeyDown = (e) => {
       if (!onClose) return;
 
+      // Make controls visible on any keypress and restart hide timer
+      setShowControls(true);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
+      controlsTimeoutRef.current = setTimeout(() => {
+        setShowControls(false);
+      }, 3000);
+
       if (e.key === 'ArrowLeft' && !showQuickList) {
         const active = document.activeElement;
         if (active && active.tagName === 'INPUT') return;
@@ -210,27 +219,37 @@ export default function Player({ channel, onChannelPlayed, onClose, channels = [
     };
   }, [channel]);
 
-  // Handle auto-hiding controls
-  const handleMouseMove = () => {
-    setShowControls(true);
-    if (controlsTimeoutRef.current) {
-      clearTimeout(controlsTimeoutRef.current);
-    }
-    
+  // Handle auto-hiding controls on state changes
+  useEffect(() => {
     if (isPlaying) {
+      setShowControls(true);
+      if (controlsTimeoutRef.current) {
+        clearTimeout(controlsTimeoutRef.current);
+      }
       controlsTimeoutRef.current = setTimeout(() => {
         setShowControls(false);
       }, 3000);
+    } else {
+      setShowControls(true);
     }
-  };
 
-  useEffect(() => {
     return () => {
       if (controlsTimeoutRef.current) {
         clearTimeout(controlsTimeoutRef.current);
       }
     };
-  }, [isPlaying]);
+  }, [isPlaying, channel]);
+
+  const handleMouseMove = () => {
+    if (!isPlaying) return;
+    setShowControls(true);
+    if (controlsTimeoutRef.current) {
+      clearTimeout(controlsTimeoutRef.current);
+    }
+    controlsTimeoutRef.current = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+  };
 
   // Toggle Actions
   const togglePlay = () => {
