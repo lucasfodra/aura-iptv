@@ -156,6 +156,15 @@ export default function App() {
     localStorage.setItem('aura_iptv_favorites', JSON.stringify(updated));
   };
 
+  // 4.5. Focus Channel (Preview)
+  const handleFocusChannel = (channel) => {
+    const originalChannel = {
+      ...channel,
+      id: channel.id.replace('merged-', '') // strip merged- prefix
+    };
+    setCurrentChannel(originalChannel);
+  };
+
   // 5. Select Channel to Play
   const handleSelectChannel = (channel) => {
     const originalChannel = {
@@ -453,23 +462,24 @@ export default function App() {
           {/* 3. DYNAMIC CHANNELS GRID & PLAYER VIEW */}
           {activeTab === 'channels' && (
             <div className="channels-view-layout">
-              {/* Left pane: Video player */}
-              <div className="player-pane">
-                <Player 
-                  channel={currentChannel} 
-                  onChannelPlayed={handleChannelPlayed}
-                />
-              </div>
-
-              {/* Right pane: Playlist explorer list */}
+              {/* Left/Middle pane: Playlist explorer list */}
               <div className="grid-pane">
                 <ChannelGrid 
                   channels={channels}
                   favorites={favorites}
                   onToggleFavorite={handleToggleFavorite}
                   onSelectChannel={handleSelectChannel}
+                  onFocusChannel={handleFocusChannel}
                   currentChannel={currentChannel}
                   activeCategory={activeCategory}
+                />
+              </div>
+
+              {/* Right pane: Video player (Preview) */}
+              <div className="player-pane">
+                <Player 
+                  channel={currentChannel} 
+                  onChannelPlayed={handleChannelPlayed}
                 />
               </div>
             </div>
@@ -569,6 +579,8 @@ export default function App() {
             channel={currentChannel} 
             onChannelPlayed={handleChannelPlayed}
             onClose={() => setIsPlayerExpanded(false)}
+            channels={channels}
+            onSelectChannel={handleSelectChannel}
           />
         </div>
       )}

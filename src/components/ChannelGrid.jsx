@@ -7,6 +7,7 @@ export default function ChannelGrid({
   favorites = [],
   onToggleFavorite,
   onSelectChannel,
+  onFocusChannel,
   currentChannel = null,
   activeCategory = 'Todos'
 }) {
@@ -137,6 +138,8 @@ export default function ChannelGrid({
                     onClick={() => onSelectChannel(channel)}
                     onKeyDown={(e) => handleKeyDown(e, channel)}
                     onKeyUp={(e) => handleKeyUp(e, channel)}
+                    onFocus={() => onFocusChannel && onFocusChannel(channel)}
+                    onMouseEnter={() => onFocusChannel && onFocusChannel(channel)}
                     tabIndex="0"
                   >
                     {/* Favorite Button (Top Right) */}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import Hls from 'hls.js';
 import { 
   Play, 
@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import './Player.css';
 
-export default function Player({ channel, onChannelPlayed, onClose }) {
+export default function Player({ channel, onChannelPlayed, onClose, channels = [], onSelectChannel }) {
   const videoRef = useRef(null);
   const containerRef = useRef(null);
   const hlsRef = useRef(null);
@@ -25,6 +25,49 @@ export default function Player({ channel, onChannelPlayed, onClose }) {
   const [volume, setVolume] = useState(0.8);
   const [isLoading, setIsLoading] = useState(false);
   const [hasError, setHasError] = useState(false);
+  const [showQuickList, setShowQuickList] = useState(false);
+  const [quickSearch, setQuickSearch] = useState('');
+
+  const filteredQuickChannels = useMemo(() => {
+    if (!channels) return [];
+    return channels.filter(c => 
+      c.name.toLowerCase().includes(quickSearch.toLowerCase()) ||
+      c.category.toLowerCase().includes(quickSearch.toLowerCase())
+    ).slice(0, 100);
+  }, [channels, quickSearch]);
+
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!onClose) return;
+
+      if (e.key === 'ArrowLeft' && !showQuickList) {
+        const active = document.activeElement;
+        if (active && active.tagName === 'INPUT') return;
+        
+        e.preventDefault();
+        setShowQuickList(true);
+        setTimeout(() => {
+          const searchInput = document.querySelector('.quick-list-search');
+          if (searchInput) searchInput.focus();
+        }, 100);
+      }
+      
+      if (e.key === 'Escape' || (e.key === 'ArrowRight' && showQuickList)) {
+        const active = document.activeElement;
+        if (e.key === 'ArrowRight' && active && active.tagName === 'INPUT') return;
+        
+        if (showQuickList) {
+          e.preventDefault();
+          setShowQuickList(false);
+          if (containerRef.current) containerRef.current.focus();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [showQuickList, onClose]);
+
   const [showControls, setShowControls] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const controlsTimeoutRef = useRef(null);
@@ -439,6 +482,46 @@ export default function Player({ channel, onChannelPlayed, onClose }) {
           </div>
         </div>
       </div>
+
+      {/* Quick Channel Switcher Overlay (Mini EPG / Guide) */}
+      {onClose && showQuickList && (
+        <div className="player-quick-list">
+          <div className="quick-list-header">
+            <h4>Sintonizar Canal</h4>
+            <span className="quick-list-desc">Use Seta Direita ou Voltar para fechar</span>
+            <input 
+              type="text" 
+              placeholder="Buscar canal..." 
+              value={quickSearch}
+              onChange={(e) => setQuickSearch(e.target.value)}
+              className="quick-list-search"
+            />
+          </div>
+          <div className="quick-list-content">
+            {filteredQuickChannels.map((chan) => {
+              const isCurrent = chan.id === channel.id || chan.name === channel.name;
+              return (
+                <button
+                  key={chan.id}
+                  className={`quick-list-item ${isCurrent ? 'active' : ''}`}
+                  onClick={() => {
+                    onSelectChannel(chan);
+                    setTimeout(() => setShowQuickList(false), 300);
+                  }}
+                >
+                  <span className="quick-list-item-name">{chan.name}</span>
+                  <span className="quick-list-item-category">{chan.category}</span>
+                </button>
+              );
+            })}
+            {filteredQuickChannels.length === 0 && (
+              <div style={{ padding: '20px', textAlign: 'center', opacity: 0.5 }}>
+                Nenhum canal encontrado
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
