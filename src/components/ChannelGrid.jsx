@@ -108,6 +108,7 @@ export default function ChannelGrid({
                     key={channel.id}
                     className={`channel-card ${isActive ? 'active' : ''}`}
                     onClick={() => onSelectChannel(channel)}
+                    tabIndex="0"
                   >
                     {/* Favorite Button (Top Right) */}
                     <button

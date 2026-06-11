@@ -202,11 +202,13 @@
   overflow: hidden;
 }
 
-.channel-card:hover {
-  transform: translateY(-4px);
+.channel-card:hover,
+.channel-card:focus {
+  transform: translateY(-4px) scale(1.03);
   background: var(--bg-card-hover);
   border-color: var(--accent-primary);
-  box-shadow: 0 8px 24px rgba(157, 78, 221, 0.15);
+  box-shadow: 0 8px 24px rgba(157, 78, 221, 0.25);
+  outline: none;
 }
 
 .channel-card.active {
@@ -340,10 +342,13 @@
   transition: var(--transition-smooth);
 }
 
-.channel-card-fav-btn:hover {
+.channel-card-fav-btn:hover,
+.channel-card-fav-btn:focus {
   transform: scale(1.1);
   background: rgba(0, 0, 0, 0.8);
   color: #ffd166;
+  outline: none;
+  box-shadow: 0 0 8px #ffd166;
 }
 
 .channel-card-fav-btn.is-fav {
